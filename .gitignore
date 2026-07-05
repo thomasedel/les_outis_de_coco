@@ -11,4 +11,3 @@ dist_portable/
 
 PDF_fusion/a_fusionner/*
 !PDF_fusion/a_fusionner/.gitkeep
-PDF_fusion/fusion.pdf

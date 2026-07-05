@@ -21,8 +21,8 @@ Point d'attention connu, **laisse tel quel a la demande de l'utilisateur** : `ap
 
 ## PDF_fusion/
 
-Fusionne tous les fichiers deposes dans `a_fusionner/` (pdf, images, `.docx`/`.doc`) en un seul `fusion.pdf` a la racine du dossier, via `fusionner.bat` -> `fusionner.py`. Tri alphabetique des fichiers pour l'ordre de fusion (l'utilisateur peut prefixer les noms `01_`, `02_`... pour forcer l'ordre).
+Fusionne tous les fichiers deposes dans `a_fusionner/` (pdf, images, `.docx`/`.doc`) en un seul PDF, via `fusionner.bat` -> `fusionner.py`. Le script liste les fichiers trouves (tri alphabetique par defaut) et demande interactivement l'ordre de fusion (ex : `1,3,2`, ou Entree pour garder l'ordre affiche) puis le nom du fichier de sortie (sans extension). Le resultat est ecrit directement sur le **Bureau de l'utilisateur** (gere le cas d'un Bureau redirige par OneDrive via la variable d'environnement `OneDrive`), pas dans le dossier du projet.
 
 - La conversion Word necessite **Microsoft Word installe** sur la machine (utilise `docx2pdf`, qui pilote Word via COM/`pywin32`). Sans Word, les fichiers `.docx`/`.doc` sont ignores avec un message d'erreur, le reste de la fusion continue normalement.
 - Les fichiers types non geres sont ignores (liste affichee en fin d'execution), la fusion ne plante pas dessus.
-- `a_fusionner/*` et `fusion.pdf` sont ignores par git (contenu personnel + sortie generee).
+- `a_fusionner/*` est ignore par git (contenu personnel). Le PDF de sortie n'est plus genere dans le dossier du projet, donc plus besoin de l'ignorer.
