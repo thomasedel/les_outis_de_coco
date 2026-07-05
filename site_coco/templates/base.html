@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Comptes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-brand">💰 Mes Comptes</div>
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">
+            📊 Tableau de bord
+        </a>
+        <a href="{{ url_for('resume') }}" class="{% if request.endpoint == 'resume' %}active{% endif %}">
+            📅 Résumé mensuel
+        </a>
+        <a href="{{ url_for('depenses') }}" class="{% if request.endpoint == 'depenses' %}active{% endif %}">
+            💸 Dépenses
+        </a>
+        <a href="{{ url_for('categories') }}" class="{% if request.endpoint == 'categories' %}active{% endif %}">
+            🏷️ Catégories
+        </a>
+    </div>
+</nav>
+
+<main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for categorie, message in messages %}
+                <div class="alert alert-{{ categorie }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

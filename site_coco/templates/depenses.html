@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <h1>💸 Mes dépenses</h1>
+</div>
+
+<!-- Formulaire ajout -->
+<div class="card">
+    <h2>➕ Ajouter une dépense</h2>
+    <form action="{{ url_for('ajouter_depense') }}" method="POST" class="form-grid">
+        <div class="form-group">
+            <label for="description">Description *</label>
+            <input type="text" id="description" name="description"
+                   placeholder="Ex: Courses Carrefour" required>
+        </div>
+        <div class="form-group">
+            <label for="montant">Montant (€) *</label>
+            <input type="number" id="montant" name="montant"
+                   placeholder="Ex: 45.50" step="0.01" min="0.01" required>
+        </div>
+        <div class="form-group">
+            <label for="categorie_id">Catégorie</label>
+            <select id="categorie_id" name="categorie_id">
+                <option value="">-- Sans catégorie --</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" value="{{ today }}">
+        </div>
+        <div class="form-group form-submit">
+            <button type="submit" class="btn btn-primary btn-large">
+                ✅ Ajouter la dépense
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Filtres -->
+<div class="card filters">
+    <h3>🔍 Filtrer</h3>
+    <form method="GET" class="form-inline">
+        <select name="categorie">
+            <option value="">Toutes les catégories</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if categorie_filtre == cat.id|string %}selected{% endif %}>
+                {{ cat.nom }}
+            </option>
+            {% endfor %}
+        </select>
+        <input type="month" name="mois" value="{{ mois_filtre }}">
+        <button type="submit" class="btn btn-secondary">Filtrer</button>
+        <a href="{{ url_for('depenses') }}" class="btn btn-outline">Réinitialiser</a>
+    </form>
+</div>
+
+<!-- Total filtré -->
+<div class="total-mini">
+    Total affiché : <strong>{{ "%.2f"|format(total_filtre) }} €</strong>
+    ({{ depenses|length }} dépense{{ 's' if depenses|length > 1 }})
+</div>
+
+<!-- Liste dépenses -->
+{% if depenses %}
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Catégorie</th>
+                <th>Montant</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in depenses %}
+            <tr>
+                <td>{{ d.date }}</td>
+                <td>{{ d.description }}</td>
+                <td>
+                    {% if d.categorie_nom %}
+                    <span class="badge" style="background-color: {{ d.couleur }}">{{ d.categorie_nom }}</span>
+                    {% else %}
+                    <span class="badge badge-grey">Sans catégorie</span>
+                    {% endif %}
+                </td>
+                <td class="montant">{{ "%.2f"|format(d.montant) }} €</td>
+                <td>
+                    <form action="{{ url_for('supprimer_depense', id=d.id) }}" method="POST"
+                          onsubmit="return confirm('Supprimer cette dépense ?')">
+                        <button type="submit" class="btn btn-danger btn-small">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">Aucune dépense trouvée.</div>
+{% endif %}
+
+{% endblock %}

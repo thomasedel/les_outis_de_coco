@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <h1>🛠️ Page Dev — Diagnostic</h1>
+</div>
+
+<div class="dev-grid">
+
+    <!-- Config distant -->
+    <div class="dev-card">
+        <h2>⚙️ Config GitHub (config.json)</h2>
+        <table class="dev-table">
+            <tr>
+                <td>URL</td>
+                <td><code>{{ config_url }}</code></td>
+            </tr>
+            <tr>
+                <td>Fetch</td>
+                <td>
+                    {% if cache.config_error %}
+                        <span class="dev-badge dev-err">❌ Échec</span>
+                    {% else %}
+                        <span class="dev-badge dev-ok">✅ OK</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% if cache.config_error %}
+            <tr>
+                <td>Erreur</td>
+                <td><code class="dev-err-msg">{{ cache.config_error }}</code></td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td>actif</td>
+                <td>
+                    {% if cache.actif %}
+                        <span class="dev-badge dev-ok">✅ true</span>
+                    {% else %}
+                        <span class="dev-badge dev-err">🔴 false</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>frequence</td>
+                <td>
+                    <strong>{{ cache.frequence }}</strong>
+                    &nbsp;→ {{ (cache.frequence * 100)|int }}% de chance
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Statut quotes -->
+    <div class="dev-card">
+        <h2>📡 Quotes GitHub</h2>
+        <table class="dev-table">
+            <tr>
+                <td>Module requests</td>
+                <td>
+                    {% if requests_ok %}
+                        <span class="dev-badge dev-ok">✅ Installé</span>
+                    {% else %}
+                        <span class="dev-badge dev-err">❌ Manquant</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>URL configurée</td>
+                <td><code>{{ quotes_url }}</code></td>
+            </tr>
+            <tr>
+                <td>Statut fetch</td>
+                <td>
+                    {% if quote_error and cache.nb_quotes == 0 %}
+                        <span class="dev-badge dev-err">❌ Échec</span>
+                    {% elif quote_error %}
+                        <span class="dev-badge" style="background:#fef9e7;color:#7d6608;">⚠️ Cache (erreur au dernier refresh)</span>
+                    {% else %}
+                        <span class="dev-badge dev-ok">✅ Succès</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Quotes en cache</td>
+                <td><strong>{{ cache.nb_quotes }}</strong> citation{{ 's' if cache.nb_quotes > 1 }}</td>
+            </tr>
+            <tr>
+                <td>Prochain refresh</td>
+                <td>
+                    {% if cache.ttl_remaining > 60 %}
+                        dans {{ (cache.ttl_remaining // 60) }} min
+                    {% else %}
+                        dans {{ cache.ttl_remaining }} sec
+                    {% endif %}
+                </td>
+            </tr>
+            {% if quote_error %}
+            <tr>
+                <td>Erreur</td>
+                <td><code class="dev-err-msg">{{ quote_error }}</code></td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <!-- Quote chargée -->
+    <div class="dev-card">
+        <h2>💬 Citation chargée</h2>
+        {% if quote %}
+            <div class="dev-quote-preview">
+                <p class="dev-quote-texte">« {{ quote.texte }} »</p>
+                <p class="dev-quote-auteur">— {{ quote.auteur }}</p>
+            </div>
+        {% else %}
+            <div class="dev-empty">
+                Aucune citation disponible (GitHub inaccessible ou fichier vide).
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Contenu du repo GitHub -->
+<div class="dev-card" style="margin-top:1.5rem">
+    <h2>📁 Contenu du repo GitHub</h2>
+    {% if repo_error %}
+        <div class="dev-empty">
+            <code class="dev-err-msg">{{ repo_error }}</code>
+        </div>
+    {% elif repo_files %}
+        <table class="dev-table" style="margin-top:0.5rem">
+            <thead style="background:#f0f2f5">
+                <tr>
+                    <td><strong>Fichier</strong></td>
+                    <td><strong>Type</strong></td>
+                    <td><strong>Taille</strong></td>
+                    <td><strong>Correspondance</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+            {% for f in repo_files %}
+            {% set target_name = quotes_url.split('/')[-1] %}
+            <tr {% if f.name == target_name %}style="background:#d5f5e3"{% endif %}>
+                <td><code>{{ f.name }}</code></td>
+                <td>{{ '📁' if f.type == 'dir' else '📄' }} {{ f.type }}</td>
+                <td>{{ f.size }} octets</td>
+                <td>
+                    {% if f.name == target_name %}
+                        <span class="dev-badge dev-ok">✅ Cible</span>
+                    {% else %}
+                        <span style="color:#bbb">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if not repo_files | selectattr('name', 'equalto', quotes_url.split('/')[-1]) | list %}
+            <div style="margin-top:0.8rem;padding:0.6rem 1rem;background:#fadbd8;border-radius:6px;font-size:0.9rem;color:#922b21">
+                ⚠️ Fichier <strong>{{ quotes_url.split('/')[-1] }}</strong> introuvable dans le repo !
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="dev-empty">Aucun fichier trouvé.</div>
+    {% endif %}
+</div>
+
+<div class="dev-hint">
+    💡 Cette page n'est pas accessible depuis les menus. URL directe : <code>/dev</code>
+</div>
+
+{% endblock %}

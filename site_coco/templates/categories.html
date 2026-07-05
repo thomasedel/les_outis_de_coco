@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <h1>🏷️ Catégories</h1>
+</div>
+
+<!-- Formulaire ajout -->
+<div class="card">
+    <h2>➕ Nouvelle catégorie</h2>
+    <form action="{{ url_for('ajouter_categorie') }}" method="POST" class="form-inline">
+        <input type="text" name="nom" placeholder="Nom de la catégorie" required>
+        <div class="color-picker-group">
+            <label>Couleur :</label>
+            <input type="color" name="couleur" value="#3498db">
+        </div>
+        <button type="submit" class="btn btn-primary">✅ Créer</button>
+    </form>
+</div>
+
+<!-- Liste catégories -->
+<div class="cats-list">
+    {% for cat in categories %}
+    <div class="cat-row">
+        <div class="cat-color-dot" style="background-color: {{ cat.couleur }}"></div>
+
+        <form action="{{ url_for('modifier_categorie', id=cat.id) }}" method="POST" class="form-inline flex-1">
+            <input type="text" name="nom" value="{{ cat.nom }}" required>
+            <input type="color" name="couleur" value="{{ cat.couleur }}">
+            <button type="submit" class="btn btn-secondary btn-small">💾 Modifier</button>
+        </form>
+
+        <span class="cat-count">{{ cat.nb_depenses }} dépense{{ 's' if cat.nb_depenses > 1 }}</span>
+
+        <form action="{{ url_for('supprimer_categorie', id=cat.id) }}" method="POST"
+              onsubmit="return confirm('Supprimer la catégorie ? Les dépenses liées ne seront pas supprimées.')">
+            <button type="submit" class="btn btn-danger btn-small">🗑️</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
